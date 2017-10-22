@@ -3,10 +3,12 @@ import time
 import Adafruit_CharLCD as LCD
 import commands
 
+#!Global
+currentDisp2 = ""
 
-def initialize()
+
+def initialize(lcd):
 	initialReading = commands.getoutput('hostname -I')
-	lcd = LCD.Adafruit_CharLCDPlate()
 	print 'Press Ctrl-C to quit.'
 	lcd.set_color(1.0, 0.0, 0.0)
 	lcd.clear()
@@ -19,24 +21,39 @@ def initialize()
 	return initialReading
 
 
-def update(reading):
-    print("update() triggered")
-    if commands.getoutput('hostname -I') == reading:
-        print("if statement triggered")
-        time.sleep(3.0)
-        update(reading)
-    else:
-        print("else statement triggered")
-        newReading = commands.getoutput('hostname -I')
-        lcd.clear()
-        lcd.message('Local IP Address:\n')
-        lcd.message(newReading)
-        time.sleep(3.0)
-        update(newReading)   
+def update(lcd,reading):
+	print("update() triggered")
+	newReading = commands.getoutput('hostname -I')
+	print("hostname is "+newReading)
+	def checkNeed(lcd,reading):
+			global currentDisp2 
+			if currentDisp2 == newReading:
+				print("currentDisp2 == reading is true")
+				time.sleep(3.0)
+				update(lcd,reading)
+			else:
+				print("currentDisp2 == reading is false")
+				lcd.clear()
+				lcd.message('Local IP Address:\n')
+				lcd.message(newReading)
+				time.sleep(3.0)
+				currentDisp2 = reading
+				update(lcd,newReading)
+	if newReading.find(".", 0, len(newReading))!=-1:
+		print('newReading.find(".", 0, len(reading))!=-1 is true')
+		currentDisp2 = newReading
+		checkNeed(lcd,reading)
+	else:
+		print('newReading.find(".", 0, len(reading))!=-1 is false')
+		time.sleep(3.0)
+		update(lcd,reading)  
 
    
 def Main():
-	initialReading = initialize()
-	update(initialReading)
+	lcd = LCD.Adafruit_CharLCDPlate()
+	initialReading = initialize(lcd)
+	update(lcd,initialReading)
+	lcd.clear()
+Main()
 
-lcd.clear()
+
