@@ -3,18 +3,21 @@ import time
 import Adafruit_CharLCD as LCD
 import commands
 
-initialReading = commands.getoutput('hostname -I')
-lcd = LCD.Adafruit_CharLCDPlate()
-print 'Press Ctrl-C to quit.'
-lcd.set_color(1.0, 0.0, 0.0)
-lcd.clear()
-lcd.show_cursor(False)
-lcd.blink(False)
-lcd.clear()
-lcd.message('Local IP Address:\n')
-lcd.message("Finding...")
-time.sleep(3.0)
-print 
+
+def initialize()
+	initialReading = commands.getoutput('hostname -I')
+	lcd = LCD.Adafruit_CharLCDPlate()
+	print 'Press Ctrl-C to quit.'
+	lcd.set_color(1.0, 0.0, 0.0)
+	lcd.clear()
+	lcd.show_cursor(False)
+	lcd.blink(False)
+	lcd.clear()
+	lcd.message('Local IP Address:\n')
+	lcd.message("Finding...")
+	time.sleep(3.0)
+	return initialReading
+
 
 def update(reading):
     print("update() triggered")
@@ -31,10 +34,9 @@ def update(reading):
         time.sleep(3.0)
         update(newReading)   
 
-    
-
-
-
-update(initialReading)
+   
+def Main():
+	initialReading = initialize()
+	update(initialReading)
 
 lcd.clear()
